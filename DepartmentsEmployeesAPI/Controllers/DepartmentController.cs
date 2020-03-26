@@ -105,7 +105,112 @@ namespace DepartmentsEmployeesAPI.Controllers
         }
        //end get department by id
 
-        //Does department exists?
+       //post a new department
+       [HttpPost]
+       public async Task<IActionResult> Post([FromBody] Department department)
+        {
+            using(SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using(SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Department (DeptName)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@deptName)";
+                    cmd.Parameters.Add(new SqlParameter("@deptName", department.DeptName));
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    department.Id = newId;
+                    return CreatedAtRoute("GetDepartment", new { id = newId }, department);
+                }
+            }
+        }
+
+        //end post new department
+
+        //update a department with PUT
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Department department)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using(SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Department
+                                            SET DeptName = @deptName
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@deptName", department.DeptName));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!DepartmentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        //end Update a department
+
+        //delete a department
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            try
+            {
+                using(SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using(SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM Department WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!DepartmentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        //end delte a department
+
+
+
+        //Does department exists? Helper function for the Update and Delete.
         private bool DepartmentExists(int id)
         {
             using (SqlConnection conn = Connection)
@@ -126,5 +231,7 @@ namespace DepartmentsEmployeesAPI.Controllers
             }
         }
         //end of Does department exists?
+
+
     }
 }
