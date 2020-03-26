@@ -221,7 +221,7 @@ namespace DepartmentsEmployeesAPI.Controllers
                     cmd.CommandText = @"
                     SELECT Id, DeptName
                     FROM Department
-                    WHERE Id = id";
+                    WHERE Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
