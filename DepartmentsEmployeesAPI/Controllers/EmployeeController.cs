@@ -104,5 +104,30 @@ namespace DepartmentsEmployeesAPI.Controllers
             }
         }
         //end get employee by id
+
+        //add employee
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Employee employee)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Employee (FirstName, LastName, DepartmentId)
+                    OUTPUT INSERTED.Id
+                    VALUES (@firstName, @lastName, @departmentId)";
+                    cmd.Parameters.Add(new SqlParameter("@firstName", employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastName", employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@departmentId", employee.DepartmentId));
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    employee.Id = newId;
+                    return CreatedAtRoute("GetEmployee", new { id = newId }, employee);
+                }
+            }
+        }
+
+        //end add employee
     }
 }
