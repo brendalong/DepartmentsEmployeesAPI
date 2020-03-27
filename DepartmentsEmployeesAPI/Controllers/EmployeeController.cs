@@ -39,8 +39,10 @@ namespace DepartmentsEmployeesAPI.Controllers
                 using(SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT Id, FirstName, LastName, DepartmentId
-                    FROM Employee";
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.Id, d.DeptName
+                    FROM Employee e
+                    LEFT JOIN Department d
+                    ON e.DepartmentId = d.Id";
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Employee> employees = new List<Employee>();
@@ -52,7 +54,12 @@ namespace DepartmentsEmployeesAPI.Controllers
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            DeptName = reader.GetString(reader.GetOrdinal("DeptName")),
+                            Department = new Department()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                DeptName = reader.GetString(reader.GetOrdinal("DeptName"))
+                            }
                         };
 
                         employees.Add(employee);
@@ -75,9 +82,11 @@ namespace DepartmentsEmployeesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT Id, FirstName, LastName, DepartmentId
-                    FROM Employee
-                    WHERE Id = @id";
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.id, d.DeptName
+                    FROM Employee e
+                    LEFT JOIN Department d
+                    ON e.DepartmentId = d.Id
+                    WHERE e.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -91,7 +100,13 @@ namespace DepartmentsEmployeesAPI.Controllers
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            DeptName = reader.GetString(reader.GetOrdinal("DeptName")),
+                            Department = new Department()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                DeptName = reader.GetString(reader.GetOrdinal("DeptName"))
+                            }
+
                         };
                         reader.Close();
 
@@ -220,8 +235,8 @@ namespace DepartmentsEmployeesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT Id, DeptName
-                    FROM Department
+                    SELECT Id, LastName
+                    FROM Employee
                     WHERE Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
