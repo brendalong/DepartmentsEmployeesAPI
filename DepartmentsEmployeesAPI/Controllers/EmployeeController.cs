@@ -39,7 +39,7 @@ namespace DepartmentsEmployeesAPI.Controllers
                 using(SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.Id, d.DeptName
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.Id AS DeptId, d.DeptName
                     FROM Employee e
                     LEFT JOIN Department d
                     ON e.DepartmentId = d.Id";
@@ -55,9 +55,10 @@ namespace DepartmentsEmployeesAPI.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DeptName = reader.GetString(reader.GetOrdinal("DeptName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             Department = new Department()
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DeptId")),
                                 DeptName = reader.GetString(reader.GetOrdinal("DeptName"))
                             }
                         };
@@ -82,11 +83,11 @@ namespace DepartmentsEmployeesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.id, d.DeptName
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, d.DeptName, d.Id AS DeptId
                     FROM Employee e
                     LEFT JOIN Department d
-                    ON e.DepartmentId = d.Id
-                    WHERE e.Id = @id";
+                    ON e.DepartmentId = d.Id";
+                   
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -103,7 +104,7 @@ namespace DepartmentsEmployeesAPI.Controllers
                             DeptName = reader.GetString(reader.GetOrdinal("DeptName")),
                             Department = new Department()
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DeptId")),
                                 DeptName = reader.GetString(reader.GetOrdinal("DeptName"))
                             }
 

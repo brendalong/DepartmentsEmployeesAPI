@@ -43,7 +43,10 @@ namespace DepartmentsEmployeesAPI.Controllers
                 conn.Open();
                 using(SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, DeptName FROM Department";
+                    cmd.CommandText = @"SELECT d.Id, d.DeptName, e.FirstName, e.LastName, e.Id AS EmpId, e.DepartmentId
+                        FROM Department d
+                        LEFT JOIN Employee e
+                        ON d.Id = e.departmentId";
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Department> departments = new List<Department>();
 
@@ -52,7 +55,7 @@ namespace DepartmentsEmployeesAPI.Controllers
                         Department department = new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            DeptName = reader.GetString(reader.GetOrdinal("DeptName"))
+                            DeptName = reader.GetString(reader.GetOrdinal("DeptName")) 
                         };
                     departments.Add(department);
                     } 
@@ -232,6 +235,9 @@ namespace DepartmentsEmployeesAPI.Controllers
         }
         //end of Does department exists?
 
+        private GetAllEmployeess(DeptId)
+        {
 
+        }
     }
 }
